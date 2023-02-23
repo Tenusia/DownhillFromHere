@@ -7,8 +7,13 @@ public class CrashDetector : MonoBehaviour
 {
     [SerializeField] float crashTime = 1f;
     [SerializeField] ParticleSystem crashEffect;
-    [SerializeField] AudioClip crashSFX;
+    AudioPlayer audioPlayer;
     bool hasCrashed = false;
+
+    void Awake()
+    {
+        audioPlayer = FindObjectOfType<AudioPlayer>();   
+    }
 
     void OnTriggerEnter2D(Collider2D other) 
     {
@@ -17,7 +22,7 @@ public class CrashDetector : MonoBehaviour
             hasCrashed = true;
             FindObjectOfType<PlayerController>().DisableControls();
             crashEffect.Play();
-            GetComponent<AudioSource>().PlayOneShot(crashSFX);
+            audioPlayer.PlayCrashSFX();
             Invoke("CrashSequence", crashTime);
         }
     }

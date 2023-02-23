@@ -8,19 +8,26 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float torqueAmount = 2f;
     [SerializeField] float boostSpeed = 30f;
     [SerializeField] float baseSpeed = 20f;
+    [SerializeField] float boostReloadTimer = 5f;
     Rigidbody2D rb2d;
-    SurfaceEffector2D surfaceEffector2D;
+    SurfaceEffector2D surfaceEffector2D;        
+    AudioPlayer audioPlayer;
+    AudioSource audioSource;
     bool canMove = true;
-
+    bool soundPlayed = false;
     
-    // Start is called before the first frame update
+    void Awake()
+    {
+        audioPlayer = FindObjectOfType<AudioPlayer>();   
+        audioSource = GetComponent<AudioSource>();
+    }
+
     void Start()
     {
        rb2d = GetComponent<Rigidbody2D> ();
        surfaceEffector2D = FindObjectOfType<SurfaceEffector2D> ();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(canMove)
@@ -50,14 +57,26 @@ void RotatePlayer()
 
     void RespondToBoost()
     {
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.Space))
         {
-            surfaceEffector2D.speed = boostSpeed;
+            StartCoroutine(Booster());
         }
         else
         {
             surfaceEffector2D.speed = baseSpeed;
+            soundPlayed = false;
         }
+    }
+
+    IEnumerator Booster()
+    {
+        surfaceEffector2D.speed = boostSpeed;
+        if(!soundPlayed)
+            {
+                audioPlayer.PlayBoostSFX();
+                soundPlayed = true;
+            }
+        yield return new WaitForSeconds(boostReloadTimer);
     }
 
 }
